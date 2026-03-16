@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>LLM Chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
+           display: flex; justify-content: center; padding: 40px 16px; }
+    .chat { width: 100%; max-width: 640px; }
+    h1 { text-align: center; margin-bottom: 24px; font-size: 1.5rem; }
+    .controls { display: flex; gap: 8px; margin-bottom: 16px; }
+    select, input, button { padding: 10px 14px; border-radius: 8px; border: 1px solid #334155;
+      background: #1e293b; color: #e2e8f0; font-size: 0.95rem; }
+    input { flex: 1; }
+    button { background: #3b82f6; border-color: #3b82f6; cursor: pointer; font-weight: 600; }
+    button:hover { background: #2563eb; }
+    .messages { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .msg { padding: 12px 16px; border-radius: 12px; max-width: 85%; white-space: pre-wrap;
+           line-height: 1.5; }
+    .user { background: #3b82f6; align-self: flex-end; }
+    .assistant { background: #1e293b; border: 1px solid #334155; align-self: flex-start; }
+    .label { font-size: 0.75rem; opacity: 0.6; margin-bottom: 4px; }
+    .meta { font-size: 0.7rem; opacity: 0.4; margin-top: 6px; }
+    #spinner { display: none; text-align: center; padding: 12px; opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <h1>🤖 LLM Chat</h1>
+    <div class="controls">
+      <select id="provider">
+        <option value="claude">Claude</option>
+        <option value="openai">OpenAI</option>
+      </select>
+      <input id="prompt" placeholder="Введите сообщение..." autofocus />
+      <button onclick="send()">→</button>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div id="spinner">⏳ Думаю...</div>
+  </div>
+<script>
+  const input = document.getElementById('prompt');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+  async function send() {
+    const prompt = input.value.trim();
+    if (!prompt) return;
+    const provider = document.getElementById('provider').value;
+
+    addMsg('user', prompt);
+    input.value = '';
+    document.getElementById('spinner').style.display = 'block';
+
+    const res = await fetch('/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ prompt, provider })
+    });
+    const data = await res.json();
+    document.getElementById('spinner').style.display = 'none';
+    addMsg('assistant', data.error || data.text, data.model, data.input_tokens, data.output_tokens);
+  }
+
+  function addMsg(role, text, model, inputTokens, outputTokens) {
+    const box = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    if (role === 'assistant') {
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = model;
+      div.appendChild(label);
+    }
+    div.appendChild(document.createTextNode(text));
+    if (role === 'assistant') {
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `in: ${inputTokens} / out: ${outputTokens} tokens`;
+      div.appendChild(meta);
+    }
+    box.appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
