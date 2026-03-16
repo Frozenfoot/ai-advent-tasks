@@ -27,6 +27,7 @@ def ask():
             model=r.model,
             input_tokens=r.input_tokens,
             output_tokens=r.output_tokens,
+            elapsed=round(r.elapsed, 2),
         )
     except Exception as e:
         return jsonify(error=str(e)), 500

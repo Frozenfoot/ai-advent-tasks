@@ -59,10 +59,10 @@
     });
     const data = await res.json();
     document.getElementById('spinner').style.display = 'none';
-    addMsg('assistant', data.error || data.text, data.model, data.input_tokens, data.output_tokens);
+    addMsg('assistant', data.error || data.text, data.model, data.input_tokens, data.output_tokens, data.elapsed);
   }
 
-  function addMsg(role, text, model, inputTokens, outputTokens) {
+  function addMsg(role, text, model, inputTokens, outputTokens, elapsed) {
     const box = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = 'msg ' + role;
@@ -76,7 +76,7 @@
     if (role === 'assistant') {
       const meta = document.createElement('div');
       meta.className = 'meta';
-      meta.textContent = `in: ${inputTokens} / out: ${outputTokens} tokens`;
+      meta.textContent = `in: ${inputTokens} / out: ${outputTokens} tokens | ${elapsed}s`;
       div.appendChild(meta);
     }
     box.appendChild(div);

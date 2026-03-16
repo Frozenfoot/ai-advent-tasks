@@ -12,7 +12,7 @@ def main():
     args = parser.parse_args()
     r = claude_api.ask(args.prompt)
     print(r.text)
-    print(f"\n[{r.model}] in: {r.input_tokens} / out: {r.output_tokens} tokens")
+    print(f"\n[{r.model}] in: {r.input_tokens} / out: {r.output_tokens} tokens | {r.elapsed:.2f}s")
 
 
 if __name__ == "__main__":

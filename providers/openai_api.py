@@ -5,6 +5,7 @@
 import openai
 from dotenv import load_dotenv
 from providers.response import LLMResponse
+from utils.timing import measure
 
 load_dotenv()
 
@@ -15,6 +16,7 @@ MODELS = {
 DEFAULT_MODEL = "pro"
 
 
+@measure
 def ask(prompt: str, model: str = DEFAULT_MODEL) -> LLMResponse:
     client = openai.OpenAI()
     response = client.chat.completions.create(

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -8,3 +8,4 @@ class LLMResponse:
     provider: str
     input_tokens: int
     output_tokens: int
+    elapsed: float = field(default=0.0)

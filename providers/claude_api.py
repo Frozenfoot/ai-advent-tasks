@@ -5,12 +5,14 @@
 import anthropic
 from dotenv import load_dotenv
 from providers.response import LLMResponse
+from utils.timing import measure
 
 load_dotenv()
 
 MODEL = "claude-sonnet-4-20250514"
 
 
+@measure
 def ask(prompt: str, max_tokens: int = 1024) -> LLMResponse:
     client = anthropic.Anthropic()
     response = client.messages.create(
