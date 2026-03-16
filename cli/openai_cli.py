@@ -4,10 +4,13 @@
                          python -m cli.openai_cli "Ваш вопрос" --model lite
 """
 import argparse
+from dotenv import load_dotenv
 from providers import openai_api
+from utils.formatting import format_stats
 
 
 def main():
+    load_dotenv()
     parser = argparse.ArgumentParser(description="Отправить запрос к OpenAI API")
     parser.add_argument("prompt", help="Текст запроса")
     parser.add_argument(
@@ -19,7 +22,7 @@ def main():
     args = parser.parse_args()
     r = openai_api.ask(args.prompt, model=args.model)
     print(r.text)
-    print(f"\n[{r.model}] in: {r.input_tokens} / out: {r.output_tokens} tokens | {r.elapsed:.2f}s")
+    print(format_stats(r))
 
 
 if __name__ == "__main__":

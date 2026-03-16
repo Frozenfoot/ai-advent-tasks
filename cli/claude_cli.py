@@ -3,16 +3,19 @@
 Запуск из корня проекта: python -m cli.claude_cli "Ваш вопрос"
 """
 import argparse
+from dotenv import load_dotenv
 from providers import claude_api
+from utils.formatting import format_stats
 
 
 def main():
+    load_dotenv()
     parser = argparse.ArgumentParser(description="Отправить запрос к Claude API")
     parser.add_argument("prompt", help="Текст запроса")
     args = parser.parse_args()
     r = claude_api.ask(args.prompt)
     print(r.text)
-    print(f"\n[{r.model}] in: {r.input_tokens} / out: {r.output_tokens} tokens | {r.elapsed:.2f}s")
+    print(format_stats(r))
 
 
 if __name__ == "__main__":

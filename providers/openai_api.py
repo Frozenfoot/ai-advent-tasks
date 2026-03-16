@@ -1,13 +1,11 @@
 """
 Обёртка над OpenAI API.
-Клиент берёт ключ из переменной окружения OPENAI_API_KEY (загружается из .env).
+Клиент берёт ключ из переменной окружения OPENAI_API_KEY.
 """
 import openai
-from dotenv import load_dotenv
-from providers.response import LLMResponse
+from functools import lru_cache
+from models.response import LLMResponse
 from utils.timing import measure
-
-load_dotenv()
 
 MODELS = {
     "pro":  "gpt-5.4",
@@ -16,10 +14,16 @@ MODELS = {
 DEFAULT_MODEL = "pro"
 
 
+@lru_cache(maxsize=1)
+def _client() -> openai.OpenAI:
+    return openai.OpenAI()
+
+
 @measure
 def ask(prompt: str, model: str = DEFAULT_MODEL) -> LLMResponse:
-    client = openai.OpenAI()
-    response = client.chat.completions.create(
+    if not prompt.strip():
+        raise ValueError("Prompt cannot be empty")
+    response = _client().chat.completions.create(
         model=MODELS[model],
         messages=[{"role": "user", "content": prompt}],
     )
